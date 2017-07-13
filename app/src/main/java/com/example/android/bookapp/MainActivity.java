@@ -58,10 +58,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //Get the query given by the user
+
         mQuery = search.getQuery().toString();
         outState.putString("query", mQuery);
-
-
     }
 
     @Override
