@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/search_bar"
         android:divider="@color/bookAuthor"
-        android:dividerHeight="1dp"
+        android:dividerHeight="@dimen/divider_height"
         android:orientation="vertical" />
 
     <!-- Empty view is only visible when the list has no items. -->

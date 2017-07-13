@@ -32,19 +32,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<Book>> onCreateLoader(int i, Bundle bundle) {
         mQuery = search.getQuery().toString();
+
         // Create a new loader for the given URL
         return new BookLoader(this, mQuery);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
-        // Clear the adapter of previous earthquake data
+        // Clear the adapter of previous book data
         View mLoadingBar = findViewById(R.id.loading_spinner);
         mLoadingBar.setVisibility(View.GONE);
         mEmptyStateTextView.setText(R.string.no_books);
         mAdapter.clear();
-        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
         if (books != null && !books.isEmpty()) {
             mAdapter.addAll(books);
         }
@@ -57,10 +56,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         //Get the query given by the user
         mQuery = search.getQuery().toString();
         outState.putString("query", mQuery);
-        super.onSaveInstanceState(outState);
+
+
     }
 
     @Override
@@ -85,6 +86,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mAdapter = new BookAdaptor(this, new ArrayList<Book>());
         bookListView.setAdapter(mAdapter);
+        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Book currentBook = mAdapter.getItem(position);
+                Uri bookUri = Uri.parse(currentBook.getUrl());
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
+                startActivity(websiteIntent);
+
+            }
+
+        });
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         final boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
@@ -105,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 //If the device is not connected to the network
                 else {
-                    //Set the text of first line of he EmptyView and hide the second line (not needed)
                     View loadingIndicator = findViewById(R.id.loading_spinner);
                     loadingIndicator.setVisibility(View.GONE);
                     mEmptyStateTextView.setText(R.string.no_internet_connection);

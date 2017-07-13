@@ -114,8 +114,7 @@ public final class BookUtils {
         try {
             //convert from string to json
             JSONObject obj = new JSONObject(bookJSON);
-            //Log.d("My App", obj.toString());
-            //extract "features" jsonarray
+            //extract "items" jsonarray
             JSONArray bookArray = obj.getJSONArray("items");
             //loop through array
 
@@ -136,16 +135,13 @@ public final class BookUtils {
                 Book book = new Book (author,title,url);
                 books.add(book);
             }
-            // to do: Parse the response given by the SAMPLE_JSON_RESPONSE string and
 
         } catch (JSONException e) {
-            // If an error is thrown when executing any of the above statements in the "try" block,
-            // catch the exception here, so the app doesn't crash. Print a log message
-            // with the message from the exception.
+
             Log.e("QueryUtils", "Problem parsing the book JSON results", e);
         }
 
-        // Return the list of earthquakes
+        // Return the list of books
         return books;
     }
 }
