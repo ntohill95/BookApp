@@ -58,16 +58,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //Get the query given by the user
-
         mQuery = search.getQuery().toString();
         outState.putString("query", mQuery);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        mQuery = savedInstanceState.getString("query");
-        //Initialize the Loader (execute the search)
         super.onRestoreInstanceState(savedInstanceState);
+        mQuery = savedInstanceState.getString("query");
     }
 
     @Override
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView bookListView = (ListView) findViewById(R.id.list);
+        final ListView bookListView = (ListView) findViewById(R.id.list);
 
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         bookListView.setEmptyView(mEmptyStateTextView);
@@ -92,13 +90,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Uri bookUri = Uri.parse(currentBook.getUrl());
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
                 startActivity(websiteIntent);
-
             }
-
         });
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        final boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
+
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -108,8 +102,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public boolean onQueryTextSubmit(String query) {
+                ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                final boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
+
                 //If the device is connected to the network
                 if (isConnected) {
+                    bookListView.setVisibility(View.VISIBLE);
                     //Restart the Loader upon the search query(execute the search)
                     getLoaderManager().restartLoader(0, null, MainActivity.this);
                     return true;
@@ -118,12 +117,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 else {
                     View loadingIndicator = findViewById(R.id.loading_spinner);
                     loadingIndicator.setVisibility(View.GONE);
+                    bookListView.setVisibility(View.GONE);
+                    mEmptyStateTextView.setVisibility(View.VISIBLE);
                     mEmptyStateTextView.setText(R.string.no_internet_connection);
                     return false;
                 }
             }
-
         });
+
         bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -131,11 +132,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Uri bookUri = Uri.parse(currentBook.getUrl());
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
                 startActivity(websiteIntent);
-
             }
-
         });
-
-
     }
 }

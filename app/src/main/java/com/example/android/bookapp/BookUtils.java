@@ -25,11 +25,11 @@ import java.util.List;
 public final class BookUtils {
     public static final String LOG_TAG = BookUtils.class.getSimpleName();
 
-    private BookUtils(){
+    private BookUtils() {
 
     }
 
-    public static List<Book> fetchBookData(String requestURL){
+    public static List<Book> fetchBookData(String requestURL) {
         URL url = createUrl(requestURL);
         String jsonResponse = null;
         try {
@@ -115,27 +115,26 @@ public final class BookUtils {
             //convert from string to json
             JSONObject obj = new JSONObject(bookJSON);
             //extract "items" jsonarray
-            JSONArray bookArray = obj.getJSONArray("items");
-            //loop through array
-
-            for(int i=0; i< bookArray.length(); i++){
-                JSONObject currentBook = bookArray.getJSONObject(i);
-                JSONObject volume = currentBook.getJSONObject("volumeInfo");
-                //extract author, title, url
-                String title = volume.getString("title");
-                String author ;
-                if (volume.has("authors")) {
-                    author = volume.getJSONArray("authors").get(0).toString();
+            if (obj.has("items")) {
+                JSONArray bookArray = obj.getJSONArray("items");
+                //loop through array
+                for (int i = 0; i < bookArray.length(); i++) {
+                    JSONObject currentBook = bookArray.getJSONObject(i);
+                    JSONObject volume = currentBook.getJSONObject("volumeInfo");
+                    //extract author, title, url
+                    String title = volume.getString("title");
+                    String author;
+                    if (volume.has("authors")) {
+                        author = volume.getJSONArray("authors").get(0).toString();
+                    } else {
+                        author = "Unknown author";
+                    }
+                    String url = volume.getString("infoLink");
+                    //create earthquake object with location mag time ..
+                    Book book = new Book(author, title, url);
+                    books.add(book);
                 }
-                else {
-                    author = "Unknown author";
-                }
-                String url = volume.getString("infoLink");
-                //create earthquake object with location mag time ..
-                Book book = new Book (author,title,url);
-                books.add(book);
             }
-
         } catch (JSONException e) {
 
             Log.e("QueryUtils", "Problem parsing the book JSON results", e);
